@@ -50,6 +50,7 @@ enum {
 
 /* Private variables ---------------------------------------------------------*/
 
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -60,106 +61,24 @@ static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
-void GPIO_PIN_SET_motor(int i){
-    switch (i)
-    {
-    case STATE0:
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_RESET);
-        break;
-        case STATE1:
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_RESET);
-        break;
-            case STATE2:
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_RESET);
-        break;
-            case STATE3:
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_SET);
-        break;
-            case STATE4:
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_RESET);
-        break;
-            case STATE5:
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_RESET);
-        break;
-            case STATE6:
-            
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_SET);
-        break;
-            case STATE7:
-        HAL_GPIO_WritePin(GPIOA,IN1,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA,IN2,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN3,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA,IN4,GPIO_PIN_SET);
-        break;
-    default:
-        break;
-    }
-}
-void full_stepping(){
-    GPIO_PIN_SET_motor(4);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(5);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(6);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(7);
-    HAL_Delay(5);
-}
-void wave_driving(){
-      GPIO_PIN_SET_motor(0);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(1);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(2);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(3);
-    HAL_Delay(5);
-}
-void half_step(){
-    GPIO_PIN_SET_motor(0);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(4);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(1);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(5);
-    HAL_Delay(5);
-     GPIO_PIN_SET_motor(2);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(6);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(3);
-    HAL_Delay(5);
-    GPIO_PIN_SET_motor(7);
-    HAL_Delay(5);
-}
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void toggleStepPin(){
+    HAL_GPIO_TogglePin(GPIOA,STEP_PIN);
+}
 /* USER CODE END 0 */
-
+void driveMotor(int interval){
+    //HAL_GPIO_WritePin(GPIOA,DIR_PIN,dir);
+    toggleStepPin();
+  
+    HAL_Delay(interval);
+    toggleStepPin();
+    HAL_Delay(interval);
+}
+void setDir(GPIO_PinState dir ){
+  HAL_GPIO_WritePin(GPIOA,DIR_PIN,dir);
+}
 /**
   * @brief  The application entry point.
   * @retval int
@@ -194,10 +113,22 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int dir=1;
+ setDir(dir); 
+    int i =0 ;
   while (1)
-  {
+  { 
+
     /* USER CODE END WHILE */
-   half_step();
+    if (i<2048) driveMotor(1);
+    else
+    {
+      dir=!dir;
+       i=0;
+       setDir(dir);
+      HAL_Delay(1000);
+    }
+    i++;
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
