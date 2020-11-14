@@ -32,7 +32,8 @@ int Wifi_Station::connectWifi() {
     this->localIP = WiFi.localIP();
     Serial.println();
     Serial.print("Connected, local IP: ");
-    Serial.print(this->localIP);
+    Serial.println(this->localIP);
+    return WIFI_SUCCESS;
 };
     
 int Wifi_Station::disconnectWifi() {
